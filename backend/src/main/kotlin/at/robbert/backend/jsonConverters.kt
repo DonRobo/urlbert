@@ -1,5 +1,6 @@
 package at.robbert.backend
 
+import at.robbert.redirector.data.Link
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.r2dbc.postgresql.codec.Json

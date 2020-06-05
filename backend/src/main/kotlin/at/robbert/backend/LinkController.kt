@@ -1,5 +1,6 @@
 package at.robbert.backend
 
+import at.robbert.redirector.data.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -8,6 +9,11 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/link")
 class LinkController(private val linkService: LinkService) {
+
+    @GetMapping("/")
+    suspend fun retrieveLinks(): List<MultiLink> {
+        return linkService.retrieveLinks()
+    }
 
     @GetMapping("/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
     suspend fun accessLink(

@@ -1,5 +1,8 @@
 package at.robbert.backend
 
+import at.robbert.redirector.data.Link
+import at.robbert.redirector.data.LinkCondition
+import at.robbert.redirector.data.MultiLink
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Service
@@ -18,6 +21,10 @@ class LinkService(private val linkRepository: LinkRepository) {
                 condition.conditionFulfilled(platform)
             }
         }
+    }
+
+    suspend fun retrieveLinks(): List<MultiLink> {
+        return linkRepository.findAll().collectList().awaitSingle()
     }
 }
 

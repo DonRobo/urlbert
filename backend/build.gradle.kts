@@ -17,13 +17,14 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":shared"))
+    implementation(project(":shared", "jvmRuntimeElements"))
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.1")
     implementation("io.projectreactor:reactor-tools:3.3.5.RELEASE")
 
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+//    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     developmentOnly("org.springframework.boot:spring-boot-devtools")

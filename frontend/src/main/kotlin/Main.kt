@@ -1,48 +1,45 @@
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.css.*
+import kotlinx.css.properties.BoxShadows
+import kotlinx.css.properties.boxShadow
 import react.*
 import react.dom.div
 import react.dom.render
+import styled.css
+import styled.styledDiv
 import kotlin.browser.document
 import kotlin.coroutines.CoroutineContext
 
-class AppState : RState {
-    var text: String = "Not initialized"
-}
 
-class ApplicationComponent : RComponent<RProps, AppState>() {
-    init {
-        state = AppState()
-//        GlobalScope.launch {
-//            val response = fetchHello()
-//            setState {
-//                text = response.text
-//            }
-//        }
-    }
-
+class ApplicationComponent : RComponent<RProps, RState>() {
     override fun RBuilder.render() {
-        div {
-            +"Currently displaying: ${state.text}"
+        styledDiv {
+            css {
+                display = Display.flex
+                width = 100.pct
+                height = 100.pct
+                overflowY = Overflow.hidden
+                overflowX = Overflow.auto
+                flexDirection = FlexDirection.row
+                justifyContent = JustifyContent.center
+            }
+            styledDiv {
+                css {
+                    padding(1.rem)
+                    margin(2.rem)
+                    backgroundColor = Color("#F9F9F9")
+                    borderRadius = 0.5.rem
+                    width = 80.pct
+                    minHeight = 80.pct
+                    boxShadow(Color.lightGray, spreadRadius = 1.rem, blurRadius = 5.rem)
+                }
+                linksComponent()
+            }
         }
     }
 
 }
-
-//suspend fun fetchHello(): Test {
-//    val url = "/api/hello"
-//    return withContext(GlobalScope.coroutineContext) {
-//        val response = window.fetch(
-//            url, RequestInit(
-//                "GET", headers = json(
-//                    "Accept" to "application/json",
-//                    "Content-Type" to "application/json"
-//                ), credentials = "same-origin".asDynamic()
-//            )
-//        ).await()
-//        return@withContext parse(Test.serializer(), response.text().await())
-//    }
-//}
 
 private class Application : CoroutineScope {
     override val coroutineContext: CoroutineContext = Job()
