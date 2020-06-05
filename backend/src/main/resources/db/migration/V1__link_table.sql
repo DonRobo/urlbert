@@ -1,0 +1,5 @@
+CREATE TABLE MULTI_LINK
+(
+    NAME  VARCHAR(32) PRIMARY KEY,
+    links jsonb NOT NULL
+);
