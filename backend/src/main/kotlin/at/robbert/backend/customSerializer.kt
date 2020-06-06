@@ -8,11 +8,8 @@ import java.sql.Timestamp
 
 @JsonComponent
 class TimestampSerializer : JsonSerializer<Timestamp>() {
-    override fun serialize(value: Timestamp?, gen: JsonGenerator, serializers: SerializerProvider) {
-        if (value != null)
-            gen.writeNumber(value.time)
-        else
-            gen.writeNull()
+    override fun serialize(value: Timestamp, gen: JsonGenerator, serializers: SerializerProvider) {
+        gen.writeNumber(value.time)
     }
 
 }
