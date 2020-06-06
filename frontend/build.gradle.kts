@@ -27,20 +27,17 @@ dependencies {
 
     implementation(project(":shared"))
 
-//    implementation(npm("core-js", "2.6.5"))
-//    implementation(npm("svg-inline-loader", "0.8.0"))
     implementation("org.jetbrains.kotlinx:kotlinx-html:0.6.12")
     implementation("org.jetbrains:kotlin-react:16.13.1-$wrapperKotlinVersion")
     implementation("org.jetbrains:kotlin-react-dom:16.13.1-$wrapperKotlinVersion")
     implementation("org.jetbrains:kotlin-styled:1.0.0-$wrapperKotlinVersion")
     implementation("org.jetbrains:kotlin-extensions:1.0.1-$wrapperKotlinVersion")
     implementation("org.jetbrains:kotlin-css-js:1.0.0-$wrapperKotlinVersion")
-    implementation(npm("react", "16.13.1"))
-    implementation(npm("react-dom", "16.13.1"))
-    implementation(npm("react-is", "16.13.1"))
-    implementation(npm("inline-style-prefixer", "5.1.0"))
-    implementation(npm("styled-components", "4.3.2"))
-
+//    implementation(npm("react", "16.13.1"))
+//    implementation(npm("react-dom", "16.13.1"))
+//    implementation(npm("react-is", "16.13.1"))
+//    implementation(npm("inline-style-prefixer", "5.1.2"))
+//    implementation(npm("styled-components", "4.3.2"))
 }
 
 tasks.withType<Kotlin2JsCompile>().configureEach {

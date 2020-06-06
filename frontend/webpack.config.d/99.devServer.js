@@ -11,11 +11,12 @@
 
         config.devServer = config.devServer || {}
         config.devServer.proxy = {
-            '/api': serverUrl
+            '/api': serverUrl,
+            '/link': serverUrl
         }
         config.devServer.watchOptions = config.devServer.watchOptions || {};
-        config.devServer.watchOptions.aggregateTimeout = 5000
-        config.devServer.watchOptions.poll = 5000
+        config.devServer.watchOptions.aggregateTimeout = 500
+        config.devServer.watchOptions.poll = 500
         config.devServer.open = false
         config.devtool = 'inline-source-map'
 

@@ -4,18 +4,20 @@ import at.robbert.redirector.data.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/link")
 class LinkController(private val linkService: LinkService) {
 
-    @GetMapping("/")
+    @GetMapping("/api/links")
     suspend fun retrieveLinks(): List<MultiLink> {
         return linkService.retrieveLinks()
     }
 
-    @GetMapping("/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
+    @GetMapping("/link/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
     suspend fun accessLink(
         @PathVariable linkName: String,
         @RequestHeader(value = "user-agent") userAgent: String

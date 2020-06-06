@@ -1,10 +1,8 @@
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.css.*
-import kotlinx.css.properties.BoxShadows
 import kotlinx.css.properties.boxShadow
 import react.*
-import react.dom.div
 import react.dom.render
 import styled.css
 import styled.styledDiv
@@ -34,7 +32,7 @@ class ApplicationComponent : RComponent<RProps, RState>() {
                     minHeight = 80.pct
                     boxShadow(Color.lightGray, spreadRadius = 1.rem, blurRadius = 5.rem)
                 }
-                linksComponent()
+                linkList()
             }
         }
     }
