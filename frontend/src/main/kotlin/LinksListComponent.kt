@@ -1,6 +1,5 @@
 import at.robbert.redirector.LinkService
-import at.robbert.redirector.data.LinkCondition
-import at.robbert.redirector.data.MultiLink
+import at.robbert.redirector.data.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.cancel
@@ -45,7 +44,16 @@ external interface ConditionProps : RProps {
 class ConditionComponent : RComponent<ConditionProps, RState>() {
     override fun RBuilder.render() {
         div {
-            +"Condition: ${props.condition.conditionType}: ${props.condition.conditionValue}"
+            +when (props.condition.conditionType) {
+                CONDITION_TYPE_COUNTRY -> "Only accessible from country ${props.condition.conditionValue}"
+                CONDITION_TYPE_PLATFORM -> "Only accessible from " + when (props.condition.conditionValue) {
+                    PLATFORM_ANDROID -> "Android devices"
+                    PLATFORM_IOS -> "iOS devices"
+                    PLATFORM_OTHER -> "PCs"
+                    else -> "Unknown platform(${props.condition.conditionValue} $TELL_ROBERT"
+                }
+                else -> "Unsupported condition(${props.condition.conditionType}) $TELL_ROBERT"
+            }
         }
     }
 

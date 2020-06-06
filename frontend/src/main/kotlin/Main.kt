@@ -9,6 +9,7 @@ import styled.styledDiv
 import kotlin.browser.document
 import kotlin.coroutines.CoroutineContext
 
+const val TELL_ROBERT = "(if you see this tell Robert)"
 
 class ApplicationComponent : RComponent<RProps, RState>() {
     override fun RBuilder.render() {

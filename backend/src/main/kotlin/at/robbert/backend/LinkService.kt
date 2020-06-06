@@ -4,10 +4,26 @@ import at.robbert.redirector.data.Link
 import at.robbert.redirector.data.LinkCondition
 import at.robbert.redirector.data.MultiLink
 import kotlinx.coroutines.reactive.awaitSingle
+import org.springframework.data.domain.Sort.Order.desc
+import org.springframework.data.r2dbc.core.DatabaseClient
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 
-interface LinkRepository : ReactiveCrudRepository<MultiLink, String>
+class CustomLinkRepositoryImpl(private val databaseClient: DatabaseClient) : CustomLinkRepository {
+    override fun retrieveAllDescByAge(): Flux<MultiLink> {
+        return databaseClient.select()
+            .from(MultiLink::class.java).orderBy(desc("createdAt"))
+            .fetch().all()
+    }
+
+}
+
+interface CustomLinkRepository {
+    fun retrieveAllDescByAge(): Flux<MultiLink>
+}
+
+interface LinkRepository : ReactiveCrudRepository<MultiLink, String>, CustomLinkRepository
 
 @Service
 class LinkService(private val linkRepository: LinkRepository) {
