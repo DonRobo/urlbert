@@ -63,7 +63,10 @@ class MultiLinkComponent : RComponent<MultiLinkProps, RState>() {
                 css {
                     fontWeight = FontWeight.bold
                 }
-                +"${window.location.origin}/link/${props.multiLink.name}"
+                val link = "${window.location.origin}/link/${props.multiLink.name}"
+                a(link) {
+                    +link
+                }
             }
             props.multiLink.links.sortedByDescending { it.conditions.size }.forEach { link ->
                 styledDiv {
