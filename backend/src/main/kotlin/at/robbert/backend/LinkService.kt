@@ -40,7 +40,11 @@ class LinkService(private val linkRepository: LinkRepository) {
     }
 
     suspend fun retrieveLinks(): List<MultiLink> {
-        return linkRepository.findAll().collectList().awaitSingle()
+        return linkRepository.retrieveAllDescByAge().collectList().awaitSingle()
+    }
+
+    suspend fun addOrUpdateLink(multiLink: MultiLink): MultiLink {
+        return linkRepository.save(multiLink).awaitSingle()
     }
 }
 

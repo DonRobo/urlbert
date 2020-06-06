@@ -1,12 +1,10 @@
 import at.robbert.redirector.LinkService
 import at.robbert.redirector.data.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.css.*
-import kotlinx.css.properties.border
+import kotlinx.css.properties.borderRight
 import kotlinx.css.properties.boxShadow
+import kotlinx.html.js.onClickFunction
 import kotlinx.serialization.ImplicitReflectionSerializer
 import react.*
 import react.dom.a
@@ -35,6 +33,7 @@ fun RBuilder.condition(handler: ConditionProps.() -> Unit): ReactElement {
 
 external interface MultiLinkProps : RProps {
     var multiLink: MultiLink
+    var deleteLink: (Int) -> Job
 }
 
 external interface ConditionProps : RProps {
@@ -76,21 +75,52 @@ class MultiLinkComponent : RComponent<MultiLinkProps, RState>() {
                     +link
                 }
             }
-            props.multiLink.links.sortedByDescending { it.conditions.size }.forEach { link ->
-                styledDiv {
-                    css {
-                        margin(0.5.rem)
-                        padding(0.5.rem)
-                        border(1.px, BorderStyle.solid, Color.gray, 3.px)
-                    }
-                    a(link.url) {
-                        +link.url
-                    }
-                    link.conditions.forEach {
-                        condition {
-                            condition = it
+            props.multiLink.links.mapIndexed { index, link -> link to index }
+                .sortedByDescending { it.first.conditions.size }.forEach { (link, index) ->
+                    styledDiv {
+                        css {
+                            margin(0.5.rem)
+                            padding(0.5.rem)
+//                        border(1.px, BorderStyle.solid, Color.gray, 3.px)
+                            display = Display.flex
+                            alignItems = Align.stretch
                         }
-                    }
+                        styledDiv {
+                            css {
+                                borderRight(1.px, BorderStyle.solid, Color.black)
+                                padding(0.3.rem)
+                                backgroundColor = Color.lightGray
+                                display = Display.flex
+                                alignItems = Align.center
+                                borderBottomLeftRadius = 0.3.rem
+                                borderTopLeftRadius = 0.3.rem
+                                cursor = Cursor.pointer
+                                hover {
+                                    backgroundColor = Color("#E0E0E0")
+                                }
+                            }
+                            attrs {
+                                onClickFunction = {
+                                    props.deleteLink(index)
+                                }
+                            }
+                            div {
+                                +"x"
+                            }
+                        }
+                        styledDiv {
+                            css {
+                                paddingLeft = 1.rem
+                            }
+                            a(link.url) {
+                                +link.url
+                            }
+                            link.conditions.forEach {
+                                condition {
+                                    condition = it
+                                }
+                            }
+                        }
                 }
             }
         }
@@ -107,6 +137,10 @@ class LinksListComponent : RComponent<RProps, LinksState>() {
 
     override fun componentDidMount() {
         console.log("Links component loaded")
+        updateLinks()
+    }
+
+    private fun updateLinks() {
         scope.launch {
             console.log("Retrieving links")
             val links = LinkService.listLinks()
@@ -132,6 +166,12 @@ class LinksListComponent : RComponent<RProps, LinksState>() {
                     key = multiLink.name
                     multiLink {
                         this.multiLink = multiLink
+                        this.deleteLink = {
+                            scope.launch {
+                                LinkService.updateMultiLink(multiLink.copy(links = multiLink.links.minusIndex(it)))
+                                updateLinks()
+                            }
+                        }
                     }
                 }
             }

@@ -3,6 +3,7 @@ package at.robbert.redirector
 import at.robbert.redirector.data.MultiLink
 import kotlinx.coroutines.await
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
@@ -14,6 +15,10 @@ import kotlin.js.json
 object LinkService {
     suspend fun listLinks(): List<MultiLink> {
         return ApiClient.get(MultiLink.serializer().list, "links")
+    }
+
+    suspend fun updateMultiLink(multiLink: MultiLink): MultiLink {
+        return ApiClient.put(MultiLink.serializer(), "link", multiLink, MultiLink.serializer())
     }
 }
 
@@ -27,6 +32,25 @@ object ApiClient {
                     "Accept" to "application/json",
                     "Content-Type" to "application/json"
                 ), credentials = "same-origin".asDynamic()
+            )
+        ).await().text().await()
+        return Json.parse(deserializationStrategy, json)
+    }
+
+    suspend fun <T, V> put(
+        deserializationStrategy: DeserializationStrategy<T>,
+        apiUrl: String,
+        body: V,
+        serializationStrategy: SerializationStrategy<V>
+    ): T {
+        val fullUrl = "/api/$apiUrl"
+        val json = window.fetch(
+            fullUrl, RequestInit(
+                "PUT", headers = json(
+                    "Accept" to "application/json",
+                    "Content-Type" to "application/json"
+                ), credentials = "same-origin".asDynamic(),
+                body = Json.stringify(serializationStrategy, body)
             )
         ).await().text().await()
         return Json.parse(deserializationStrategy, json)
