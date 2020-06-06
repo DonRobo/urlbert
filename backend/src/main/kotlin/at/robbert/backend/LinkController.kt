@@ -31,7 +31,7 @@ class LinkController(private val linkService: LinkService) {
         }
         val link: Link = linkService.retrieveLink(linkName, platform)
         log.debug("Retrieved link: $link")
-        return ResponseEntity.status(HttpStatus.PERMANENT_REDIRECT)
+        return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT)
             .headers {
                 it["Location"] = link.url
             }.build()

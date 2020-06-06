@@ -7,7 +7,9 @@ import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.domain.Sort.Order.desc
 import org.springframework.data.r2dbc.core.DatabaseClient
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Flux
 
 class CustomLinkRepositoryImpl(private val databaseClient: DatabaseClient) : CustomLinkRepository {
@@ -32,11 +34,11 @@ class LinkService(private val linkRepository: LinkRepository) {
     }
 
     suspend fun retrieveLink(linkName: String, platform: String): Link {
-        return retrieveMultiLink(linkName).links.sortedByDescending { it.conditions.size }.first { link ->
+        return retrieveMultiLink(linkName).links.sortedByDescending { it.conditions.size }.firstOrNull { link ->
             link.conditions.all { condition ->
                 condition.conditionFulfilled(platform)
             }
-        }
+        } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No link found")
     }
 
     suspend fun retrieveLinks(): List<MultiLink> {
