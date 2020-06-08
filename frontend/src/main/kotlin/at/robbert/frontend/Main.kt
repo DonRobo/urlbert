@@ -1,3 +1,7 @@
+package at.robbert.frontend
+
+import at.robbert.frontend.components.initializeCss
+import at.robbert.frontend.components.linkList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.css.*
@@ -18,8 +22,6 @@ class ApplicationComponent : RComponent<RProps, RState>() {
                 display = Display.flex
                 width = 100.pct
                 height = 100.pct
-                overflowY = Overflow.hidden
-                overflowX = Overflow.auto
                 flexDirection = FlexDirection.row
                 justifyContent = JustifyContent.center
             }
@@ -31,6 +33,8 @@ class ApplicationComponent : RComponent<RProps, RState>() {
                     borderRadius = 0.5.rem
                     width = 80.pct
                     minHeight = 80.pct
+                    overflowY = Overflow.auto
+                    overflowX = Overflow.hidden
                     boxShadow(Color.lightGray, spreadRadius = 1.rem, blurRadius = 5.rem)
                 }
                 linkList()
@@ -44,6 +48,7 @@ private class Application : CoroutineScope {
     override val coroutineContext: CoroutineContext = Job()
 
     fun start() {
+        initializeCss()
         document.getElementById("root")?.let {
             render(buildElement {
                 val el = child(ApplicationComponent::class) {

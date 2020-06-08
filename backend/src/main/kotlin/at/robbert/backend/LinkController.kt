@@ -16,6 +16,7 @@ class LinkController(private val linkService: LinkService) {
 
     @PutMapping("/api/link")
     suspend fun updateLink(@RequestBody multiLink: MultiLink): MultiLink {
+        require(multiLink.links.all { link -> link.url.isNotBlank() && link.conditions.all { condition -> condition.isValid } }) { "Invalid multilink" }
         return linkService.addOrUpdateLink(multiLink)
     }
 

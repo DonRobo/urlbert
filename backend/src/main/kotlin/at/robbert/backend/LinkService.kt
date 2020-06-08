@@ -46,13 +46,13 @@ class LinkService(private val linkRepository: LinkRepository) {
     }
 
     suspend fun addOrUpdateLink(multiLink: MultiLink): MultiLink {
-        return linkRepository.save(multiLink).awaitSingle()
+        return linkRepository.save(multiLink.copy(createdAt = null)).awaitSingle()
     }
 }
 
 private fun LinkCondition.conditionFulfilled(platform: String): Boolean {
     return when (conditionType) {
         "PLATFORM" -> conditionValue == platform
-        else -> throw UnsupportedOperationException("Conditiontype $conditionType not supported")
+        else -> throw UnsupportedOperationException("Condition type $conditionType not supported")
     }
 }
