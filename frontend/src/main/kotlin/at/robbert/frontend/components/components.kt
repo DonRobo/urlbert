@@ -60,7 +60,7 @@ fun RDOMBuilder<DIV>.formSelect(
         +name
         select {
             attrs {
-                this.value = value
+                set("value", value)
 
                 onChangeFunction = {
                     onChange(it.target.asDynamic().value as String)
