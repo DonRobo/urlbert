@@ -26,4 +26,8 @@ val LinkCondition.isValid
 data class Link(val conditions: List<LinkCondition>, val url: String)
 
 @Serializable
-data class MultiLink(@Id val name: String, val links: List<Link>, @ContextualSerialization val createdAt: Timestamp?)
+data class MultiLink(
+    @Id val name: String,
+    val links: List<Link>,
+    @ContextualSerialization val createdAt: Timestamp? = null
+)

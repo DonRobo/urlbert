@@ -2,7 +2,9 @@ package at.robbert.frontend.components
 
 import at.robbert.frontend.components.Styles.*
 import at.robbert.redirector.data.*
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.css.FontWeight
 import kotlinx.css.fontWeight
 import kotlinx.html.InputType
@@ -23,6 +25,7 @@ external interface MultiLinkProps : RProps {
     var multiLink: MultiLink
     var deleteLink: (Int) -> Job
     var createLink: (Link) -> Job
+    var deleteMultiLink: () -> Job
 }
 
 external interface MultiLinkState : RState {
@@ -63,13 +66,18 @@ class MultiLinkComponent : RComponent<MultiLinkProps, MultiLinkState>() {
 
     override fun RBuilder.render() {
         div(flexColumn, shadowedBox, flexNoStretch) {
-            styledDiv {
-                css {
-                    fontWeight = FontWeight.bold
+            div(flexRow, flexCenter) {
+                button("x") {
+                    props.deleteMultiLink()
                 }
-                val link = "${window.location.origin}/link/${props.multiLink.name}"
-                a(link) {
-                    +link
+                styledDiv {
+                    css {
+                        fontWeight = FontWeight.bold
+                    }
+                    val link = "${window.location.origin}/link/${props.multiLink.name}"
+                    a(link) {
+                        +link
+                    }
                 }
             }
             props.multiLink.links.mapIndexed { index, link -> link to index }
@@ -89,9 +97,11 @@ class MultiLinkComponent : RComponent<MultiLinkProps, MultiLinkState>() {
             else
                 div(flexColumn, ml3) {
                     val submitFunction = {
-                        props.createLink(Link(state.newConditions.filter { it.isValid }, state.newLink))
-                        setState {
-                            creatingNew = false
+                        GlobalScope.launch {
+                            props.createLink(Link(state.newConditions.filter { it.isValid }, state.newLink)).join()
+                            setState {
+                                creatingNew = false
+                            }
                         }
                     }
                     formInput("Link", state.newLink, { submitFunction() }, InputType.text) {

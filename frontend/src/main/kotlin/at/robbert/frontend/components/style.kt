@@ -19,6 +19,10 @@ enum class Styles(val rule: RuleSet) {
         display = Display.flex
         flexDirection = FlexDirection.row
     }),
+    flexCenter({
+        display = Display.flex
+        alignItems = kotlinx.css.Align.center
+    }),
     flexStretch({
         display = Display.flex
         alignItems = Align.stretch

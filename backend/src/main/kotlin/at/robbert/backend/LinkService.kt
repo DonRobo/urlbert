@@ -3,6 +3,7 @@ package at.robbert.backend
 import at.robbert.redirector.data.Link
 import at.robbert.redirector.data.LinkCondition
 import at.robbert.redirector.data.MultiLink
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.domain.Sort.Order.desc
 import org.springframework.data.r2dbc.core.DatabaseClient
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 class CustomLinkRepositoryImpl(private val databaseClient: DatabaseClient) : CustomLinkRepository {
     override fun retrieveAllDescByAge(): Flux<MultiLink> {
@@ -19,10 +21,15 @@ class CustomLinkRepositoryImpl(private val databaseClient: DatabaseClient) : Cus
             .fetch().all()
     }
 
+    override fun insert(multiLink: MultiLink): Mono<Int> {
+        return databaseClient.insert().into(MultiLink::class.java).using(multiLink).fetch().rowsUpdated()
+    }
+
 }
 
 interface CustomLinkRepository {
     fun retrieveAllDescByAge(): Flux<MultiLink>
+    fun insert(multiLink: MultiLink): Mono<Int>
 }
 
 interface LinkRepository : ReactiveCrudRepository<MultiLink, String>, CustomLinkRepository
@@ -45,8 +52,17 @@ class LinkService(private val linkRepository: LinkRepository) {
         return linkRepository.retrieveAllDescByAge().collectList().awaitSingle()
     }
 
-    suspend fun addOrUpdateLink(multiLink: MultiLink): MultiLink {
+    suspend fun updateLink(multiLink: MultiLink): MultiLink {
         return linkRepository.save(multiLink.copy(createdAt = null)).awaitSingle()
+    }
+
+    suspend fun addLink(multiLink: MultiLink): MultiLink {
+        linkRepository.insert(multiLink.copy(createdAt = null)).awaitSingle()
+        return linkRepository.findById(multiLink.name).awaitSingle()
+    }
+
+    suspend fun deleteLink(name: String) {
+        linkRepository.deleteById(name).awaitFirstOrNull()
     }
 }
 

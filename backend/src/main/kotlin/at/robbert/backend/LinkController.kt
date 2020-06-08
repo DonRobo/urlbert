@@ -16,8 +16,26 @@ class LinkController(private val linkService: LinkService) {
 
     @PutMapping("/api/link")
     suspend fun updateLink(@RequestBody multiLink: MultiLink): MultiLink {
+        validateMultiLink(multiLink)
+        return linkService.updateLink(multiLink)
+    }
+
+    @DeleteMapping("/api/link/{linkName}")
+    suspend fun deleteLink(@PathVariable linkName: String): MultiLink {
+        val ml = linkService.retrieveMultiLink(linkName)
+        linkService.deleteLink(linkName)
+        return ml
+    }
+
+    @PostMapping("/api/link")
+    suspend fun addLink(@RequestBody multiLink: MultiLink): MultiLink {
+        require(multiLink.name.isNotBlank()) { "Invalid name" }
+        validateMultiLink(multiLink)
+        return linkService.addLink(multiLink)
+    }
+
+    private fun validateMultiLink(multiLink: MultiLink) {
         require(multiLink.links.all { link -> link.url.isNotBlank() && link.conditions.all { condition -> condition.isValid } }) { "Invalid multilink" }
-        return linkService.addOrUpdateLink(multiLink)
     }
 
     @GetMapping("/link/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
