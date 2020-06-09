@@ -1,4 +1,4 @@
-package at.robbert.backend
+package at.robbert.backend.util
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JsonSerializer

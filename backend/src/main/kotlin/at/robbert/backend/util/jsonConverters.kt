@@ -1,4 +1,4 @@
-package at.robbert.backend
+package at.robbert.backend.util
 
 import at.robbert.redirector.data.Link
 import com.fasterxml.jackson.databind.ObjectMapper

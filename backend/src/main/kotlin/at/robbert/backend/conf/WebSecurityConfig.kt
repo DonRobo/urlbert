@@ -1,4 +1,4 @@
-package at.robbert.backend
+package at.robbert.backend.conf
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,6 +18,7 @@ class WebSecurityConfig {
     fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
         return http.authorizeExchange()
             .pathMatchers(HttpMethod.GET, "/link/**").permitAll()
+            .pathMatchers("/api/user/**").permitAll()
             .anyExchange().hasRole("ADMIN")
             .and().httpBasic()
             .and().build()

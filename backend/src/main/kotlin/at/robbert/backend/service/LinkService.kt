@@ -1,4 +1,4 @@
-package at.robbert.backend
+package at.robbert.backend.service
 
 import at.robbert.redirector.data.Link
 import at.robbert.redirector.data.LinkCondition
