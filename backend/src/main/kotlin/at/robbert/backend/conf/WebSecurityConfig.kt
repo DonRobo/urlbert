@@ -21,7 +21,9 @@ class WebSecurityConfig {
             .pathMatchers("/api/user/**").permitAll()
             .anyExchange().hasRole("ADMIN")
             .and().httpBasic()
-            .and().build()
+            .and().csrf().disable()
+            .build()
+
     }
 
     @Bean

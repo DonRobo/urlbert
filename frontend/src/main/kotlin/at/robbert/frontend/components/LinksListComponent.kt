@@ -1,11 +1,15 @@
 package at.robbert.frontend.components
 
-import at.robbert.frontend.components.Styles.*
+import at.robbert.frontend.lib.Styles.*
+import at.robbert.frontend.lib.button
+import at.robbert.frontend.lib.div
+import at.robbert.frontend.lib.formInput
 import at.robbert.redirector.LinkService
 import at.robbert.redirector.data.MultiLink
 import at.robbert.redirector.data.minusIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.html.InputType
 import react.*
@@ -31,6 +35,14 @@ class LinksListComponent : RComponent<RProps, LinksListState>() {
 
     override fun componentDidMount() {
         updateLinks()
+    }
+
+    override fun componentWillUnmount() {
+        try {
+            scope.cancel()
+        } catch (ex: IllegalStateException) {
+            console.log(ex)
+        }
     }
 
     private fun updateLinks() {

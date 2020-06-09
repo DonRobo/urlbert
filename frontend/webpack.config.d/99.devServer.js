@@ -18,7 +18,7 @@
         config.devServer.watchOptions.aggregateTimeout = 500;
         config.devServer.watchOptions.poll = 500;
         config.devServer.open = false;
-        config.devServer.historyApiFallback = true;
+        // config.devServer.historyApiFallback = true;
         config.devtool = 'inline-source-map';
 
     }

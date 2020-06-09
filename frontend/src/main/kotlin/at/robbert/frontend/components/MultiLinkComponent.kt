@@ -1,6 +1,10 @@
 package at.robbert.frontend.components
 
-import at.robbert.frontend.components.Styles.*
+import at.robbert.frontend.lib.Styles.*
+import at.robbert.frontend.lib.button
+import at.robbert.frontend.lib.div
+import at.robbert.frontend.lib.formInput
+import at.robbert.frontend.lib.formSelect
 import at.robbert.redirector.data.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job

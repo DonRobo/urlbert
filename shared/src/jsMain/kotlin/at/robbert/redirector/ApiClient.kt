@@ -1,11 +1,14 @@
 package at.robbert.redirector
 
 import at.robbert.redirector.data.MultiLink
+import at.robbert.redirector.data.UUID
+import at.robbert.redirector.data.UpdatePasswordPayload
 import kotlinx.coroutines.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 //import kotlinx.coroutines.await
 import org.w3c.fetch.RequestInit
@@ -15,6 +18,17 @@ import kotlin.js.json
 external fun encodeURIComponent(str: String): String
 
 fun String.encodeUriComponent(): String = encodeURIComponent(this)
+
+object UserService {
+    suspend fun updatePassword(password: String, secret: UUID): Boolean {
+        return ApiClient.put(
+            Boolean.serializer(),
+            "user/setPassword",
+            UpdatePasswordPayload(password, secret),
+            UpdatePasswordPayload.serializer()
+        )
+    }
+}
 
 object LinkService {
     suspend fun listLinks(): List<MultiLink> {

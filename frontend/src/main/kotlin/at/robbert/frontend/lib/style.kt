@@ -1,4 +1,4 @@
-package at.robbert.frontend.components
+package at.robbert.frontend.lib
 
 import kotlinx.css.*
 import kotlinx.css.properties.borderRight

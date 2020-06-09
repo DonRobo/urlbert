@@ -1,7 +1,9 @@
-package at.robbert.frontend.components
+package at.robbert.frontend.lib
 
 import kotlinx.html.DIV
 import kotlinx.html.InputType
+import kotlinx.html.InputType.password
+import kotlinx.html.InputType.text
 import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.js.onKeyDownFunction
@@ -22,8 +24,8 @@ fun RDOMBuilder<DIV>.button(style: Styles, label: String, block: (MouseEvent) ->
 fun <T> RDOMBuilder<DIV>.formInput(
     name: String,
     value: T,
-    onSubmit: () -> Unit,
-    type: InputType,
+    onSubmit: () -> Unit = {},
+    type: InputType = text,
     onChange: (T) -> Unit
 ) {
     label {
@@ -32,7 +34,7 @@ fun <T> RDOMBuilder<DIV>.formInput(
             attrs {
                 onChangeFunction = {
                     val newValue: T = when (type) {
-                        InputType.text -> it.target.asDynamic().value
+                        text, password -> it.target.asDynamic().value
                         else -> throw UnsupportedOperationException("Input type $type not supported")
                     } as T
                     onChange(newValue)

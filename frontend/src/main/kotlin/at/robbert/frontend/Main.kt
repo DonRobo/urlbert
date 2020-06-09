@@ -1,7 +1,7 @@
 package at.robbert.frontend
 
-import at.robbert.frontend.components.initializeCss
-import at.robbert.frontend.components.linkList
+import at.robbert.frontend.components.navigation
+import at.robbert.frontend.lib.initializeCss
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.css.*
@@ -37,7 +37,7 @@ class ApplicationComponent : RComponent<RProps, RState>() {
                     overflowX = Overflow.hidden
                     boxShadow(Color.lightGray, spreadRadius = 1.rem, blurRadius = 5.rem)
                 }
-                linkList()
+                navigation()
             }
         }
     }

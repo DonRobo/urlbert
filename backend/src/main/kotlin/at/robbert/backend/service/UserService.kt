@@ -38,7 +38,9 @@ interface UserRepositoryCustom {
     fun updatePasswordAndResetSecret(username: String, password: String): Mono<Int>
 }
 
-interface UserRepository : ReactiveCrudRepository<User, String>, UserRepositoryCustom
+interface UserRepository : ReactiveCrudRepository<User, String>, UserRepositoryCustom {
+    fun findUserBySecret(secret: UUID): Mono<User>
+}
 
 @Service
 class UserService(val userRepository: UserRepository, val passwordEncoder: PasswordEncoder) :
@@ -54,11 +56,11 @@ class UserService(val userRepository: UserRepository, val passwordEncoder: Passw
         return getUser(username)
     }
 
-    suspend fun updatePassword(username: String, password: String, secret: UUID): User {
-        val user = getUser(username)
+    suspend fun updatePassword(password: String, secret: UUID): User {
+        val user = userRepository.findUserBySecret(secret).awaitSingle()
         if (user.secret == secret) {
-            userRepository.updatePasswordAndResetSecret(username, passwordEncoder.encode(password)).awaitSingle()
-            return getUser(username)
+            userRepository.updatePasswordAndResetSecret(user.username, passwordEncoder.encode(password)).awaitSingle()
+            return getUser(user.username)
         } else {
             error("User not found")
         }
