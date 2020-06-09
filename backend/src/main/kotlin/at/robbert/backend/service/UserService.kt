@@ -1,5 +1,6 @@
 package at.robbert.backend.service
 
+import at.robbert.backend.util.log
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.annotation.Id
 import org.springframework.data.r2dbc.core.DatabaseClient
@@ -71,12 +72,15 @@ class UserService(val userRepository: UserRepository, val passwordEncoder: Passw
     }
 
     override fun findByUsername(username: String): Mono<UserDetails> {
+        log.debug("Looking for $username")
         return userRepository.findById(username).map {
-            SpringUser(
+            val u = SpringUser(
                 it.username,
                 it.password,
-                listOf(SimpleGrantedAuthority("ADMIN"))
+                listOf(SimpleGrantedAuthority("ROLE_ADMIN"))
             )
+            log.debug("Found $u")
+            u
         }
     }
 

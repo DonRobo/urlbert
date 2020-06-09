@@ -31,6 +31,7 @@ dependencies {
     implementation("org.jetbrains:kotlin-react:16.13.1-$wrapperKotlinVersion")
     implementation("org.jetbrains:kotlin-react-dom:16.13.1-$wrapperKotlinVersion")
     implementation("org.jetbrains:kotlin-react-router-dom:5.1.2-$wrapperKotlinVersion")
+    implementation("org.jetbrains:kotlin-react-redux:5.0.7-$wrapperKotlinVersion")
     implementation("org.jetbrains:kotlin-styled:1.0.0-$wrapperKotlinVersion")
     implementation("org.jetbrains:kotlin-extensions:1.0.1-$wrapperKotlinVersion")
     implementation("org.jetbrains:kotlin-css-js:1.0.0-$wrapperKotlinVersion")

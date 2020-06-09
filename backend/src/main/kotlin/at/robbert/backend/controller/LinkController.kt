@@ -37,7 +37,9 @@ class LinkController(private val linkService: LinkService) {
     }
 
     private fun validateMultiLink(multiLink: MultiLink) {
-        require(multiLink.links.all { link -> link.url.isNotBlank() && link.conditions.all { condition -> condition.isValid } }) { "Invalid multilink" }
+        require(multiLink.links.all { link -> link.url.isNotBlank() && link.conditions.all { condition -> condition.isValid } }) {
+            "Invalid multilink"
+        }
     }
 
     @GetMapping("/link/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
