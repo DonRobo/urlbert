@@ -1,5 +1,6 @@
 package at.robbert.backend.service
 
+import at.robbert.backend.util.notFound
 import at.robbert.redirector.data.Link
 import at.robbert.redirector.data.LinkCondition
 import at.robbert.redirector.data.MultiLink
@@ -8,9 +9,7 @@ import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.domain.Sort.Order.desc
 import org.springframework.data.r2dbc.core.DatabaseClient
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -36,16 +35,16 @@ interface LinkRepository : ReactiveCrudRepository<MultiLink, String>, CustomLink
 
 @Service
 class LinkService(private val linkRepository: LinkRepository) {
-    suspend fun retrieveMultiLink(linkName: String): MultiLink {
-        return linkRepository.findById(linkName).awaitSingle()
+    suspend fun retrieveMultiLink(linkName: String): MultiLink? {
+        return linkRepository.findById(linkName).awaitFirstOrNull()
     }
 
     suspend fun retrieveLink(linkName: String, platform: String): Link {
-        return retrieveMultiLink(linkName).links.sortedByDescending { it.conditions.size }.firstOrNull { link ->
+        return retrieveMultiLink(linkName)?.links?.sortedByDescending { it.conditions.size }?.firstOrNull { link ->
             link.conditions.all { condition ->
                 condition.conditionFulfilled(platform)
             }
-        } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No link found")
+        } ?: notFound("No link found")
     }
 
     suspend fun retrieveLinks(): List<MultiLink> {

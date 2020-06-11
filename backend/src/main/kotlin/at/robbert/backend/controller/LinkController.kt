@@ -2,10 +2,12 @@ package at.robbert.backend.controller
 
 import at.robbert.backend.service.LinkService
 import at.robbert.backend.util.log
+import at.robbert.backend.util.notFound
 import at.robbert.redirector.data.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -26,7 +28,7 @@ class LinkController(private val linkService: LinkService) {
     suspend fun deleteLink(@PathVariable linkName: String): MultiLink {
         val ml = linkService.retrieveMultiLink(linkName)
         linkService.deleteLink(linkName)
-        return ml
+        return ml ?: notFound()
     }
 
     @PostMapping("/api/link")
@@ -45,15 +47,20 @@ class LinkController(private val linkService: LinkService) {
     @GetMapping("/link/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
     suspend fun accessLink(
         @PathVariable linkName: String,
-        @RequestHeader(value = "user-agent") userAgent: String
+        @RequestHeader(value = "user-agent") userAgent: String,
+        request: ServerHttpRequest
     ): ResponseEntity<Nothing> {
+        log.debug("Redirecting request link/$linkName")
+        request.headers.forEach { (key, value) ->
+            log.debug("\t$key: ${value.joinToString(", ")}")
+        }
         val platform = when {
             userAgent.contains("android", ignoreCase = true) -> PLATFORM_ANDROID
             userAgent.containsAny(listOf("iphone", "ipad", "ipod"), ignoreCase = true) -> PLATFORM_IOS
             else -> PLATFORM_OTHER
         }
         val link: Link = linkService.retrieveLink(linkName, platform)
-        log.debug("Retrieved link: $link")
+        log.debug("\tredirecting to: ${link.url}")
         return ResponseEntity.status(HttpStatus.FOUND)
             .headers {
                 it["Location"] = link.url
