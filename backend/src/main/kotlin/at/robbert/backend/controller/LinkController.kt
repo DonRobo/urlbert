@@ -62,10 +62,12 @@ class LinkController(private val linkService: LinkService) {
         log.debug("\trequest from: ${request.remoteAddress}")
         val link: Link = linkService.retrieveLink(linkName, platform)
         log.debug("\tredirecting to: ${link.url}")
-        return ResponseEntity.status(HttpStatus.FOUND)
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
             .headers {
                 it["Location"] = link.url
                 it["Vary"] = "User-Agent"
+                it["X-Frame-Options"] = "SAMEORIGIN"
+                it["X-Content-Type-Option"] = "nosniff"
                 it["Content"] = "text/html; charset=utf-8"
             }.build()
     }
