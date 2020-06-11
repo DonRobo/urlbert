@@ -78,7 +78,7 @@ class LinkController(private val linkService: LinkService) {
         @RequestHeader(value = "user-agent") userAgent: String,
         request: ServerHttpRequest
     ): ResponseEntity<Nothing> {
-        return accessLinkWithPath(linkName, userAgent, request)
+        return accessLink(linkName, userAgent, request)
     }
 
 }
