@@ -72,6 +72,15 @@ class LinkController(private val linkService: LinkService) {
             }.build()
     }
 
+    @GetMapping("/link/**/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
+    suspend fun accessLinkWithPath(
+        @PathVariable linkName: String,
+        @RequestHeader(value = "user-agent") userAgent: String,
+        request: ServerHttpRequest
+    ): ResponseEntity<Nothing> {
+        return accessLinkWithPath(linkName, userAgent, request)
+    }
+
 }
 
 private fun String.containsAny(substrings: List<String>, ignoreCase: Boolean): Boolean = substrings.any { subString ->
