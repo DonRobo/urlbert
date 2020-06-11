@@ -59,6 +59,7 @@ class LinkController(private val linkService: LinkService) {
             userAgent.containsAny(listOf("iphone", "ipad", "ipod"), ignoreCase = true) -> PLATFORM_IOS
             else -> PLATFORM_OTHER
         }
+        log.debug("\trequest from: ${request.remoteAddress}")
         val link: Link = linkService.retrieveLink(linkName, platform)
         log.debug("\tredirecting to: ${link.url}")
         return ResponseEntity.status(HttpStatus.FOUND)
