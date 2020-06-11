@@ -67,7 +67,7 @@ class LinkController(private val linkService: LinkService) {
                 it["Location"] = link.url
                 it["Vary"] = "User-Agent"
                 it["X-Frame-Options"] = "SAMEORIGIN"
-                it["X-Content-Type-Option"] = "nosniff"
+                it["X-Content-Type-Options"] = "nosniff"
                 it["Content"] = "text/html; charset=utf-8"
             }.build()
     }
