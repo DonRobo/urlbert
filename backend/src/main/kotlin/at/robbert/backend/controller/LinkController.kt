@@ -83,18 +83,20 @@ class LinkController(private val linkService: LinkService) {
             it["X-Content-Type-Options"] = "nosniff"
             it["Content-Type"] = "text/html; charset=utf-8"
         }.body(
-            createHTML().apply {
-                head {
-                    title {
-                        +"Hello World"
+            "<!DOCTYPE html>\n" + createHTML().apply {
+                html {
+                    head {
+                        title {
+                            +"MBR Link"
+                        }
                     }
-                }
-                body {
-                    div {
-                        +"Hi there. I'm supposed to redirect you to ${link.url}"
-                    }
-                    script {
-                        +"window.alert('Hi');"
+                    body {
+                        script {
+                            +"const redirectTo='${link.url.escapeJsString()}';"
+                        }
+                        script {
+                            src = "/jsRedirect.js"
+                        }
                     }
                 }
             }.finalize()

@@ -27,6 +27,7 @@ kotlin {
                 implementation(kotlin("stdlib-jdk8"))
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
                 implementation("org.springframework.data:spring-data-commons:2.3.0.RELEASE")
+                implementation("org.apache.commons:commons-text:1.8")
             }
         }
         val jsMain by getting {
