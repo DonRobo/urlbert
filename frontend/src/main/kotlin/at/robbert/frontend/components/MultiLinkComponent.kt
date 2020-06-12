@@ -6,6 +6,7 @@ import at.robbert.frontend.lib.div
 import at.robbert.redirector.data.Link
 import at.robbert.redirector.data.LinkCondition
 import at.robbert.redirector.data.MultiLink
+import at.robbert.redirector.data.containsDuplicates
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -64,6 +65,11 @@ class MultiLinkComponent : RComponent<MultiLinkProps, MultiLinkState>() {
                         this.deleteLink = { props.deleteLink(index) }
                     }
                 }
+            if (props.multiLink.links.map { it.conditions }.containsDuplicates()) {
+                div(warning) {
+                    +"Warning! There are links where it's not clear which one should be chosen!"
+                }
+            }
             if (!state.creatingNew)
                 div(flexRow) {
                     button("Add new") {

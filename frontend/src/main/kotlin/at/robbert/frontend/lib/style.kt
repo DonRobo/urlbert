@@ -73,6 +73,10 @@ enum class Styles(val rule: RuleSet) {
         boxShadow(Color.lightGray, spreadRadius = 0.2.rem, blurRadius = 0.2.rem)
         padding(1.rem)
         margin(1.rem)
+    }),
+    warning({
+        color = Color.red
+        fontWeight = FontWeight.bold
     })
 }
 
