@@ -4,7 +4,8 @@ import at.robbert.backend.service.LinkService
 import at.robbert.backend.util.log
 import at.robbert.backend.util.notFound
 import at.robbert.redirector.data.*
-import org.springframework.http.HttpStatus
+import kotlinx.html.*
+import kotlinx.html.stream.createHTML
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.server.reactive.ServerHttpRequest
@@ -49,7 +50,7 @@ class LinkController(private val linkService: LinkService) {
         @PathVariable linkName: String,
         @RequestHeader(value = "user-agent") userAgent: String,
         request: ServerHttpRequest
-    ): ResponseEntity<Nothing> {
+    ): ResponseEntity<String> {
         log.debug("Redirecting request link/$linkName")
         request.headers.forEach { (key, value) ->
             log.debug("\t$key: ${value.joinToString(", ")}")
@@ -61,15 +62,43 @@ class LinkController(private val linkService: LinkService) {
         }
         log.debug("\trequest from: ${request.remoteAddress}")
         val link: Link = linkService.retrieveLink(linkName, platform)
-        log.debug("\tredirecting to: ${link.url}")
-        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-            .headers {
-                it["Location"] = link.url
-                it["Vary"] = "User-Agent"
-                it["X-Frame-Options"] = "SAMEORIGIN"
-                it["X-Content-Type-Options"] = "nosniff"
-                it["Content-Type"] = "text/html; charset=utf-8"
-            }.build()
+        log.debug("\tredirecting to: ${link.url} using ${link.redirection}")
+        return when (link.redirection.method) {
+            RedirectMethod.HTTP -> ResponseEntity.status(link.redirection.status ?: error("Link malformed"))
+                .headers {
+                    it["Location"] = link.url
+                    it["Vary"] = "User-Agent"
+                    it["X-Frame-Options"] = "SAMEORIGIN"
+                    it["X-Content-Type-Options"] = "nosniff"
+                    it["Content-Type"] = "text/html; charset=utf-8"
+                }.build()
+            RedirectMethod.JS -> executeJavascriptRedirect(link)
+        }
+    }
+
+    private fun executeJavascriptRedirect(link: Link): ResponseEntity<String> {
+        return ResponseEntity.status(200).headers {
+            it["Vary"] = "User-Agent"
+            it["X-Frame-Options"] = "SAMEORIGIN"
+            it["X-Content-Type-Options"] = "nosniff"
+            it["Content-Type"] = "text/html; charset=utf-8"
+        }.body(
+            createHTML().apply {
+                head {
+                    title {
+                        +"Hello World"
+                    }
+                }
+                body {
+                    div {
+                        +"Hi there. I'm supposed to redirect you to ${link.url}"
+                    }
+                    script {
+                        +"window.alert('Hi');"
+                    }
+                }
+            }.finalize()
+        )
     }
 
     @GetMapping("/link/**/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
@@ -77,7 +106,7 @@ class LinkController(private val linkService: LinkService) {
         @PathVariable linkName: String,
         @RequestHeader(value = "user-agent") userAgent: String,
         request: ServerHttpRequest
-    ): ResponseEntity<Nothing> {
+    ): ResponseEntity<String> {
         return accessLink(linkName, userAgent, request)
     }
 

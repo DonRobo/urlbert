@@ -14,10 +14,10 @@ fun RBuilder.createLink(handler: CreateLinkProps.() -> Unit): ReactElement {
     }
 }
 
-
 external interface CreateLinkState : RState {
     var newConditions: List<LinkCondition>
     var newLink: String
+    var redirection: Redirection
 }
 
 external interface CreateLinkProps : RProps {
@@ -29,18 +29,54 @@ class CreateLinkComponent : RComponent<CreateLinkProps, CreateLinkState>() {
     init {
         state.newConditions = emptyList()
         state.newLink = ""
+        state.redirection = Redirection(RedirectMethod.HTTP, 301)
     }
 
     override fun RBuilder.render() {
         div(Styles.flexColumn, Styles.ml3) {
             val submitFunction = {
                 GlobalScope.launch {
-                    props.createLink(Link(state.newConditions.filter { it.isValid }, state.newLink))
+                    props.createLink(Link(state.newConditions.filter { it.isValid }, state.newLink, state.redirection))
                 }
             }
             formInput("Link", state.newLink, { submitFunction() }, InputType.text) {
                 setState {
                     newLink = it
+                }
+            }
+            formSelect(
+                "Redirection method",
+                state.redirection.method.name,
+                options = RedirectMethod.values().map {
+                    it.name to when (it) {
+                        RedirectMethod.HTTP -> "HTTP Redirect"
+                        RedirectMethod.JS -> "Javascript Redirect"
+                    }
+                },
+                emptyOption = false
+            ) {
+                val m = RedirectMethod.valueOf(it)
+                setState {
+                    if (m != RedirectMethod.HTTP && redirection.status != null) {
+                        redirection = redirection.copy(status = null)
+                    }
+                    redirection = redirection.copy(method = m)
+                }
+            }
+            if (state.redirection.method == RedirectMethod.HTTP) {
+                formSelect(
+                    "HTTP Status",
+                    state.redirection.status?.toString() ?: "301",
+                    options = listOf(
+                        "301" to "301 Moved Permanently",
+                        "302" to "302 Found",
+                        "307" to "307 Temporary Redirect"
+                    ),
+                    emptyOption = false
+                ) {
+                    setState {
+                        redirection = redirection.copy(status = it.toInt())
+                    }
                 }
             }
             state.newConditions.forEachIndexed { index, con ->
