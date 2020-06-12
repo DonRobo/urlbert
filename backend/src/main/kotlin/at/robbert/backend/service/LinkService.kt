@@ -4,6 +4,7 @@ import at.robbert.backend.util.notFound
 import at.robbert.redirector.data.Link
 import at.robbert.redirector.data.LinkCondition
 import at.robbert.redirector.data.MultiLink
+import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.domain.Sort.Order.desc
@@ -13,7 +14,8 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-class CustomLinkRepositoryImpl(private val databaseClient: DatabaseClient) : CustomLinkRepository {
+class CustomLinkRepositoryImpl(private val databaseClient: DatabaseClient, private val objectMapper: ObjectMapper) :
+    CustomLinkRepository {
     override fun retrieveAllDescByAge(): Flux<MultiLink> {
         return databaseClient.select()
             .from(MultiLink::class.java).orderBy(desc("createdAt"))
@@ -52,7 +54,8 @@ class LinkService(private val linkRepository: LinkRepository) {
     }
 
     suspend fun updateLink(multiLink: MultiLink): MultiLink {
-        return linkRepository.save(multiLink.copy(createdAt = null)).awaitSingle()
+        val ml = retrieveMultiLink(multiLink.name) ?: error("Updated link disappeared!")
+        return linkRepository.save(ml.copy(links = multiLink.links)).awaitSingle()
     }
 
     suspend fun addLink(multiLink: MultiLink): MultiLink {

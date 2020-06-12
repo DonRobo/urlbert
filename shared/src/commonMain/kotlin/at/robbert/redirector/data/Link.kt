@@ -22,8 +22,19 @@ val LinkCondition.isValid
         else -> false
     }
 
+enum class RedirectMethod {
+    HTTP, JS
+}
+
 @Serializable
-data class Link(val conditions: List<LinkCondition>, val url: String)
+data class Redirection(val method: RedirectMethod, val status: Int?)
+
+@Serializable
+data class Link(
+    val conditions: List<LinkCondition>,
+    val url: String,
+    val redirection: Redirection = Redirection(RedirectMethod.HTTP, 301)
+)
 
 @Serializable
 data class MultiLink(

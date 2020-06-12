@@ -86,10 +86,12 @@ class LinksListComponent : RComponent<RProps, LinksListState>() {
             div(flexColumn, shadowedBox, flexNoStretch) {
                 fun submitFunction() {
                     scope.launch {
-                        LinkService.addMultiLink(state.addingNew)
-                        updateLinks()
-                        setState {
-                            addingNew = ""
+                        if (state.addingNew.isNotBlank()) {
+                            LinkService.addMultiLink(state.addingNew)
+                            updateLinks()
+                            setState {
+                                addingNew = ""
+                            }
                         }
                     }
                 }
