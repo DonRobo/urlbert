@@ -73,6 +73,10 @@ class LinkController(private val linkService: LinkService) {
                     it["Content-Type"] = "text/html; charset=utf-8"
                 }.build()
             RedirectMethod.JS -> executeJavascriptRedirect(link, linkService.retrieveLink(linkName, PLATFORM_OTHER))
+            RedirectMethod.FAST_JS -> executeFastJavascriptRedirect(
+                link,
+                linkService.retrieveLink(linkName, PLATFORM_OTHER)
+            )
         }
     }
 
@@ -105,6 +109,42 @@ class LinkController(private val linkService: LinkService) {
                         }
                         script {
                             src = "/jsRedirect.js"
+                        }
+                    }
+                }
+            }.finalize()
+        )
+    }
+
+    private fun executeFastJavascriptRedirect(link: Link, default: Link): ResponseEntity<String> {
+        return ResponseEntity.status(200).headers {
+            it["Vary"] = "User-Agent"
+            it["X-Frame-Options"] = "SAMEORIGIN"
+            it["X-Content-Type-Options"] = "nosniff"
+            it["Content-Type"] = "text/html; charset=utf-8"
+        }.body(
+            "<!DOCTYPE html>\n" + createHTML().apply {
+                html {
+                    head {
+                        title {
+                            +"MBR Link"
+                        }
+                    }
+                    body {
+                        script {
+                            unsafe {
+                                //language=JavaScript
+                                +"""
+const redirectTo='${link.url.escapeJsString()}';
+const alternative='${default.url.escapeJsString()}';
+setTimeout(()=>{
+    window.location.href = redirectTo;
+    setTimeout(()=>{
+        window.location.href = alternative;
+    }, 1500);
+}, 350)
+                                """.trimIndent()
+                            }
                         }
                     }
                 }

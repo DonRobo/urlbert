@@ -23,7 +23,7 @@ val LinkCondition.isValid
     }
 
 enum class RedirectMethod {
-    HTTP, JS
+    HTTP, JS, FAST_JS
 }
 
 @Serializable

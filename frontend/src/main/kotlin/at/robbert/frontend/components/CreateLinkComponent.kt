@@ -51,6 +51,7 @@ class CreateLinkComponent : RComponent<CreateLinkProps, CreateLinkState>() {
                     it.name to when (it) {
                         RedirectMethod.HTTP -> "HTTP Redirect"
                         RedirectMethod.JS -> "Javascript Redirect"
+                        RedirectMethod.FAST_JS -> "Lightweight Javascript Redirect"
                     }
                 },
                 emptyOption = false
