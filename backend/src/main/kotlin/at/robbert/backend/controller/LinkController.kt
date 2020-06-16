@@ -98,8 +98,10 @@ class LinkController(private val linkService: LinkService) {
                             id = "log"
                         }
                         script {
-                            +"const redirectTo='${link.url.escapeJsString()}';"
-                            +"const alternative='${default.url.escapeJsString()}';"
+                            unsafe {
+                                +"const redirectTo='${link.url.escapeJsString()}';"
+                                +"const alternative='${default.url.escapeJsString()}';"
+                            }
                         }
                         script {
                             src = "/jsRedirect.js"
