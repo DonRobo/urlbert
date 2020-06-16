@@ -98,6 +98,12 @@ class LinkController(private val linkService: LinkService) {
                         script {
                             src = "/jsRedirect.js"
                         }
+                        div {
+                            +"Loading..."
+                        }
+                        div {
+                            id = "log"
+                        }
                     }
                 }
             }.finalize()
