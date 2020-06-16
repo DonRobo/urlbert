@@ -29,6 +29,6 @@ suspend fun main() {
 }
 
 fun doRedirect(url: String) {
-    window.location.href = url
     log("Redirecting to $url")
+    window.location.href = url
 }
