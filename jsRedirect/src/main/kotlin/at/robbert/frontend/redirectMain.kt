@@ -1,11 +1,16 @@
 package at.robbert.frontend
 
-import kotlinx.coroutines.delay
 import kotlin.browser.document
 import kotlin.browser.window
 
 external val redirectTo: String
 external val alternative: String
+
+fun delay(delay: Int, block: () -> Unit) {
+    window.setTimeout({
+        block()
+    }, delay)
+}
 
 fun log(text: String) {
     val logger = document.getElementById("log")
@@ -18,17 +23,20 @@ fun log(text: String) {
     console.log(text)
 }
 
-suspend fun main() {
+fun main() {
     log("Waiting 500ms")
-    delay(500)
-    doRedirect(redirectTo)
-    window.setTimeout({
-        log("Redirect to app($redirectTo) didn't work after 1000ms. Redirecting to $alternative")
-        doRedirect(alternative)
-    }, 1000)
+    delay(500) {
+        doRedirect(redirectTo)
+        delay(1000) {
+            log("Redirect to app($redirectTo) didn't work after 1000ms. Redirecting to $alternative")
+            doRedirect(alternative)
+        }
+    }
 }
 
 fun doRedirect(url: String) {
     log("Redirecting to $url")
-    window.location.href = url
+    delay(100) {
+        window.location.href = url
+    }
 }
