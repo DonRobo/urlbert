@@ -27,7 +27,7 @@ fun main() {
     log("Waiting 500ms")
     delay(500) {
         doRedirect(redirectTo)
-        delay(1000) {
+        delay(2000) {
             log("Redirect to app($redirectTo) didn't work after 1000ms. Redirecting to $alternative")
             doRedirect(alternative)
         }
