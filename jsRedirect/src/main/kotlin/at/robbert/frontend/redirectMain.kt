@@ -29,8 +29,8 @@ fun log(text: String) {
 }
 
 fun main() {
-    log("Waiting 500ms")
-    delay(500) {
+    log("Waiting 250ms")
+    delay(250) {
         doRedirect(redirectTo)
         delay(1500) {
             log("Redirect to app($redirectTo) didn't work after 1500ms. Redirecting to $alternative")

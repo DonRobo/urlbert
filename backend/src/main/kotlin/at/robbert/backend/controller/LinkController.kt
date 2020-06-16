@@ -91,9 +91,9 @@ class LinkController(private val linkService: LinkService) {
                         }
                     }
                     body {
-                        div {
-                            +"Loading..."
-                        }
+//                        div {
+//                            +"Loading..."
+//                        }
                         div {
                             id = "log"
                         }
