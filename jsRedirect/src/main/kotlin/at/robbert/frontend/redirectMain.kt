@@ -36,7 +36,7 @@ fun main() {
 
 fun doRedirect(url: String) {
     log("Redirecting to $url")
-    delay(100) {
+    delay(1000) {
         window.location.href = url
     }
 }
