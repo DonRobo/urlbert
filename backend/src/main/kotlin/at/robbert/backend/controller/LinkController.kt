@@ -72,11 +72,11 @@ class LinkController(private val linkService: LinkService) {
                     it["X-Content-Type-Options"] = "nosniff"
                     it["Content-Type"] = "text/html; charset=utf-8"
                 }.build()
-            RedirectMethod.JS -> executeJavascriptRedirect(link)
+            RedirectMethod.JS -> executeJavascriptRedirect(link, linkService.retrieveLink(linkName, PLATFORM_OTHER))
         }
     }
 
-    private fun executeJavascriptRedirect(link: Link): ResponseEntity<String> {
+    private fun executeJavascriptRedirect(link: Link, default: Link): ResponseEntity<String> {
         return ResponseEntity.status(200).headers {
             it["Vary"] = "User-Agent"
             it["X-Frame-Options"] = "SAMEORIGIN"
@@ -93,6 +93,7 @@ class LinkController(private val linkService: LinkService) {
                     body {
                         script {
                             +"const redirectTo='${link.url.escapeJsString()}';"
+                            +"const alternative='${default.url.escapeJsString()}';"
                         }
                         script {
                             src = "/jsRedirect.js"
