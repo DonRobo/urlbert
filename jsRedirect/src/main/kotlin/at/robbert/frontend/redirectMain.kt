@@ -12,13 +12,18 @@ fun delay(delay: Int, block: () -> Unit) {
     }, delay)
 }
 
+const val enableHtmlLogging = false
+
+@Suppress("ConstantConditionIf")
 fun log(text: String) {
-    val logger = document.getElementById("log")
-    if (logger != null) {
-        val tDiv = document.createElement("div")
-        val textNode = document.createTextNode(text)
-        tDiv.appendChild(textNode)
-        logger.appendChild(tDiv)
+    if (enableHtmlLogging) {
+        val logger = document.getElementById("log")
+        if (logger != null) {
+            val tDiv = document.createElement("div")
+            val textNode = document.createTextNode(text)
+            tDiv.appendChild(textNode)
+            logger.appendChild(tDiv)
+        }
     }
     console.log(text)
 }
