@@ -89,10 +89,15 @@ class LinkController(private val linkService: LinkService) {
                         title {
                             +"MBR Link"
                         }
+                        // <meta http-equiv="refresh" content="3; URL=http://www.example.com/">
+                        meta {
+                            httpEquiv = "refresh"
+                            content = "3; URL=${default.url}"
+                        }
                     }
                     body {
                         div {
-                            +"Loading..."
+                            id = "loading"
                         }
                         div {
                             id = "log"
@@ -100,6 +105,7 @@ class LinkController(private val linkService: LinkService) {
                         script {
                             +"const redirectTo='${link.url.escapeJsString()}';"
                             +"const alternative='${default.url.escapeJsString()}';"
+                            +"document.getElementById('loading').innerHTML = 'Loading...';"
                         }
                         script {
                             src = "/jsRedirect.js"
