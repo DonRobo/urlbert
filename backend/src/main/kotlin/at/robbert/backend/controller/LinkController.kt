@@ -91,18 +91,18 @@ class LinkController(private val linkService: LinkService) {
                         }
                     }
                     body {
+                        div {
+                            +"Loading..."
+                        }
+                        div {
+                            id = "log"
+                        }
                         script {
                             +"const redirectTo='${link.url.escapeJsString()}';"
                             +"const alternative='${default.url.escapeJsString()}';"
                         }
                         script {
                             src = "/jsRedirect.js"
-                        }
-                        div {
-                            +"Loading..."
-                        }
-                        div {
-                            id = "log"
                         }
                     }
                 }
