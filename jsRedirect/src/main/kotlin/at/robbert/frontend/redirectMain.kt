@@ -27,8 +27,8 @@ fun main() {
     log("Waiting 500ms")
     delay(500) {
         doRedirect(redirectTo)
-        delay(2000) {
-            log("Redirect to app($redirectTo) didn't work after 1000ms. Redirecting to $alternative")
+        delay(1500) {
+            log("Redirect to app($redirectTo) didn't work after 1500ms. Redirecting to $alternative")
             doRedirect(alternative)
         }
     }
@@ -36,7 +36,7 @@ fun main() {
 
 fun doRedirect(url: String) {
     log("Redirecting to $url")
-    delay(1000) {
+    delay(100) {
         window.location.href = url
     }
 }
