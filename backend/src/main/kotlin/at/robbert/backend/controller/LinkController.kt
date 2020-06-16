@@ -90,10 +90,10 @@ class LinkController(private val linkService: LinkService) {
                             +"MBR Link"
                         }
                         // <meta http-equiv="refresh" content="3; URL=http://www.example.com/">
-                        meta {
-                            httpEquiv = "refresh"
-                            content = "3; URL=${default.url}"
-                        }
+//                        meta {
+//                            httpEquiv = "refresh"
+//                            content = "3; URL=${default.url}"
+//                        }
                     }
                     body {
                         div {
