@@ -15,6 +15,6 @@ class GeoLocationService {
     }
 
     fun locate(ipAddress: InetAddress): String {
-        return dbReader.tryCountry(ipAddress).orElse(null)?.country?.name ?: "Country not found"
+        return dbReader.tryCountry(ipAddress).orElse(null)?.country?.isoCode ?: "Country not found"
     }
 }

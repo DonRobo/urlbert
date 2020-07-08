@@ -69,7 +69,7 @@ class LinkService(private val linkRepository: LinkRepository) {
 private fun LinkCondition.conditionFulfilled(platform: String, country: String): Boolean {
     return when (conditionType) {
         CONDITION_TYPE_PLATFORM -> conditionValue == platform
-        CONDITION_TYPE_COUNTRY -> conditionValue == country
+        CONDITION_TYPE_COUNTRY -> conditionValue.equals(country, ignoreCase = true)
         else -> throw UnsupportedOperationException("Condition type $conditionType not supported")
     }
 }
