@@ -22,6 +22,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.1")
     implementation("io.projectreactor:reactor-tools:3.3.5.RELEASE")
 
+    implementation("com.maxmind.geoip2:geoip2:2.13.1")
+
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-webflux")

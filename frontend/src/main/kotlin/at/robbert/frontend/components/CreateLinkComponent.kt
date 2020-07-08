@@ -91,27 +91,48 @@ class CreateLinkComponent : RComponent<CreateLinkProps, CreateLinkState>() {
                         formSelect(
                             "Condition type",
                             con.conditionType,
-                            listOf(CONDITION_TYPE_PLATFORM to "Platform")
+                            listOf(
+                                CONDITION_TYPE_PLATFORM to "Platform",
+                                CONDITION_TYPE_COUNTRY to "Country"
+                            ),
+                            emptyOption = false
                         ) {
-                            console.log(con, it)
-                            setState {
-                                this.newConditions = newConditions.set(index, con.copy(conditionType = it))
+                            this@CreateLinkComponent.setState {
+                                newConditions = newConditions.set(index, con.copy(conditionType = it))
                             }
+                            console.log(con, it, index)
                         }
-                        formSelect(
-                            "Condition value", con.conditionValue, listOf(
-                                PLATFORM_ANDROID to "Android",
-                                PLATFORM_IOS to "iOS",
-                                PLATFORM_OTHER to "Browser"
-                            )
-                        ) {
-                            setState {
-                                this.newConditions = newConditions.set(index, con.copy(conditionValue = it))
+                        when (con.conditionType) {
+                            CONDITION_TYPE_PLATFORM -> {
+                                formSelect(
+                                    "Condition value", con.conditionValue, listOf(
+                                        PLATFORM_ANDROID to "Android",
+                                        PLATFORM_IOS to "iOS",
+                                        PLATFORM_OTHER to "Browser"
+                                    )
+                                ) {
+                                    setState {
+                                        this.newConditions = newConditions.set(index, con.copy(conditionValue = it))
+                                    }
+                                }
+                            }
+                            CONDITION_TYPE_COUNTRY -> {
+                                formInput(
+                                    "Condition value", con.conditionValue
+                                ) {
+                                    setState {
+                                        this.newConditions =
+                                            newConditions.set(index, con.copy(conditionValue = it.toUpperCase()))
+                                    }
+                                }
+                            }
+                            else -> {
+                                +"Select condition type!"
                             }
                         }
                     }
                 }
-
+                Unit
             }
             div(Styles.flexRow) {
                 button("Add condition") {

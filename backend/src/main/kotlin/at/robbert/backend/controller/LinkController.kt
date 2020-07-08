@@ -1,5 +1,6 @@
 package at.robbert.backend.controller
 
+import at.robbert.backend.service.GeoLocationService
 import at.robbert.backend.service.LinkService
 import at.robbert.backend.util.log
 import at.robbert.backend.util.notFound
@@ -10,9 +11,10 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.web.bind.annotation.*
+import java.net.InetAddress
 
 @RestController
-class LinkController(private val linkService: LinkService) {
+class LinkController(private val linkService: LinkService, private val geoLocationService: GeoLocationService) {
 
     @GetMapping("/api/links")
     suspend fun retrieveLinks(): List<MultiLink> {
@@ -41,27 +43,32 @@ class LinkController(private val linkService: LinkService) {
 
     private fun validateMultiLink(multiLink: MultiLink) {
         require(multiLink.links.all { link -> link.url.isNotBlank() && link.conditions.all { condition -> condition.isValid } }) {
-            "Invalid multilink"
+            "Invalid multilink: $multiLink"
         }
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     @GetMapping("/link/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
     suspend fun accessLink(
         @PathVariable linkName: String,
         @RequestHeader(value = "user-agent") userAgent: String,
+        @RequestHeader(value = "X-Forwarded-For") remoteIp: String,
         request: ServerHttpRequest
     ): ResponseEntity<String> {
+        val country = geoLocationService.locate(InetAddress.getByName(remoteIp))
+
         log.debug("Redirecting request link/$linkName")
         request.headers.forEach { (key, value) ->
             log.debug("\t$key: ${value.joinToString(", ")}")
         }
+        log.debug("\tCountry: $country")
         val platform = when {
             userAgent.contains("android", ignoreCase = true) -> PLATFORM_ANDROID
             userAgent.containsAny(listOf("iphone", "ipad", "ipod"), ignoreCase = true) -> PLATFORM_IOS
             else -> PLATFORM_OTHER
         }
         log.debug("\trequest from: ${request.remoteAddress}")
-        val link: Link = linkService.retrieveLink(linkName, platform)
+        val link: Link = linkService.retrieveLink(linkName, platform, country)
         log.debug("\tredirecting to: ${link.url} using ${link.redirection}")
         return when (link.redirection.method) {
             RedirectMethod.HTTP -> ResponseEntity.status(link.redirection.status ?: error("Link malformed"))
@@ -72,10 +79,13 @@ class LinkController(private val linkService: LinkService) {
                     it["X-Content-Type-Options"] = "nosniff"
                     it["Content-Type"] = "text/html; charset=utf-8"
                 }.build()
-            RedirectMethod.JS -> executeJavascriptRedirect(link, linkService.retrieveLink(linkName, PLATFORM_OTHER))
+            RedirectMethod.JS -> executeJavascriptRedirect(
+                link,
+                linkService.retrieveLink(linkName, PLATFORM_OTHER, country)
+            )
             RedirectMethod.FAST_JS -> executeFastJavascriptRedirect(
                 link,
-                linkService.retrieveLink(linkName, PLATFORM_OTHER)
+                linkService.retrieveLink(linkName, PLATFORM_OTHER, country)
             )
         }
     }
@@ -156,9 +166,10 @@ setTimeout(()=>{
     suspend fun accessLinkWithPath(
         @PathVariable linkName: String,
         @RequestHeader(value = "user-agent") userAgent: String,
+        @RequestHeader(value = "X-Forwarded-For") remoteIp: String,
         request: ServerHttpRequest
     ): ResponseEntity<String> {
-        return accessLink(linkName, userAgent, request)
+        return accessLink(linkName, userAgent, remoteIp, request)
     }
 
 }

@@ -19,6 +19,7 @@ data class LinkCondition(val conditionType: String, val conditionValue: String)
 val LinkCondition.isValid
     get() = when (conditionType) {
         CONDITION_TYPE_PLATFORM -> conditionValue in setOf(PLATFORM_ANDROID, PLATFORM_IOS, PLATFORM_OTHER)
+        CONDITION_TYPE_COUNTRY -> conditionValue.isNotBlank()
         else -> false
     }
 

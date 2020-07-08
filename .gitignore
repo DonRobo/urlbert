@@ -2,3 +2,4 @@
 build/
 .idea/
 urlbert.jar
+*.mmdb

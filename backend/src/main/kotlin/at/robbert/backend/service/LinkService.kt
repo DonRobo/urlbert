@@ -1,9 +1,7 @@
 package at.robbert.backend.service
 
 import at.robbert.backend.util.notFound
-import at.robbert.redirector.data.Link
-import at.robbert.redirector.data.LinkCondition
-import at.robbert.redirector.data.MultiLink
+import at.robbert.redirector.data.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
@@ -41,10 +39,10 @@ class LinkService(private val linkRepository: LinkRepository) {
         return linkRepository.findById(linkName).awaitFirstOrNull()
     }
 
-    suspend fun retrieveLink(linkName: String, platform: String): Link {
+    suspend fun retrieveLink(linkName: String, platform: String, country: String): Link {
         return retrieveMultiLink(linkName)?.links?.sortedByDescending { it.conditions.size }?.firstOrNull { link ->
             link.conditions.all { condition ->
-                condition.conditionFulfilled(platform)
+                condition.conditionFulfilled(platform, country)
             }
         } ?: notFound("No link found")
     }
@@ -68,9 +66,10 @@ class LinkService(private val linkRepository: LinkRepository) {
     }
 }
 
-private fun LinkCondition.conditionFulfilled(platform: String): Boolean {
+private fun LinkCondition.conditionFulfilled(platform: String, country: String): Boolean {
     return when (conditionType) {
-        "PLATFORM" -> conditionValue == platform
+        CONDITION_TYPE_PLATFORM -> conditionValue == platform
+        CONDITION_TYPE_COUNTRY -> conditionValue == country
         else -> throw UnsupportedOperationException("Condition type $conditionType not supported")
     }
 }
