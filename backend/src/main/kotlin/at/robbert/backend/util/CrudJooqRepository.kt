@@ -1,28 +1,11 @@
 package at.robbert.backend.util
 
-import org.jooq.*
+import org.jooq.DSLContext
+import org.jooq.Field
+import org.jooq.Table
+import org.jooq.UpdatableRecord
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-
-abstract class MappingCrudJooqRepository<R : UpdatableRecord<*>, M : Any?>(
-    ctx: DSLContext,
-    table: Table<R>,
-    val mapper: RecordMapper<Record, M>
-) : CrudJooqRepository<R>(ctx, table) {
-
-    open fun <T> findByIdMapped(id: T): Mono<M> {
-        return findById(id).map(mapper::map)
-    }
-
-    open fun insertMapped(record: R): Mono<M> {
-        return insert(record).map(mapper::map)
-    }
-
-    open fun upsertMapped(record: R): Mono<M> {
-        return upsert(record).map(mapper::map)
-    }
-
-}
 
 abstract class CrudJooqRepository<R : UpdatableRecord<*>>(val ctx: DSLContext, val table: Table<R>) {
 

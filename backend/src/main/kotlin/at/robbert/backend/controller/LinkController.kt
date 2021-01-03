@@ -5,6 +5,8 @@ import at.robbert.backend.service.LinkService
 import at.robbert.backend.util.log
 import at.robbert.backend.util.notFound
 import at.robbert.redirector.data.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 import org.springframework.http.MediaType
@@ -70,24 +72,30 @@ class LinkController(private val linkService: LinkService, private val geoLocati
         log.debug("\trequest from: ${request.remoteAddress}")
         val link: Link = linkService.retrieveLink(linkName, platform, country)
         log.debug("\tredirecting to: ${link.url} using ${link.redirection}")
-        return when (link.redirection.method) {
-            RedirectMethod.HTTP -> ResponseEntity.status(link.redirection.status ?: error("Link malformed"))
-                .headers {
-                    it["Location"] = link.url
-                    it["Vary"] = "User-Agent"
-                    it["X-Frame-Options"] = "SAMEORIGIN"
-                    it["X-Content-Type-Options"] = "nosniff"
-                    it["Content-Type"] = "text/html; charset=utf-8"
-                }.build()
-            RedirectMethod.JS -> executeJavascriptRedirect(
-                link,
-                linkService.retrieveLink(linkName, PLATFORM_OTHER, country)
-            )
-            RedirectMethod.FAST_JS -> executeFastJavascriptRedirect(
-                link,
-                linkService.retrieveLink(linkName, PLATFORM_OTHER, country)
-            )
+        return coroutineScope {
+            launch {
+                linkService.linkClicked(linkName, link.url)
+            }
+            return@coroutineScope when (link.redirection.method) {
+                RedirectMethod.HTTP -> ResponseEntity.status(link.redirection.status ?: error("Link malformed"))
+                    .headers {
+                        it["Location"] = link.url
+                        it["Vary"] = "User-Agent"
+                        it["X-Frame-Options"] = "SAMEORIGIN"
+                        it["X-Content-Type-Options"] = "nosniff"
+                        it["Content-Type"] = "text/html; charset=utf-8"
+                    }.build()
+                RedirectMethod.JS -> executeJavascriptRedirect(
+                    link,
+                    linkService.retrieveLink(linkName, PLATFORM_OTHER, country)
+                )
+                RedirectMethod.FAST_JS -> executeFastJavascriptRedirect(
+                    link,
+                    linkService.retrieveLink(linkName, PLATFORM_OTHER, country)
+                )
+            }
         }
+
     }
 
     private fun executeJavascriptRedirect(link: Link, default: Link): ResponseEntity<String> {

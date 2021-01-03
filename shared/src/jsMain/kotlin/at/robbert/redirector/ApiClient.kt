@@ -1,5 +1,6 @@
 package at.robbert.redirector
 
+import at.robbert.redirector.data.ClickCounts
 import at.robbert.redirector.data.MultiLink
 import at.robbert.redirector.data.UUID
 import at.robbert.redirector.data.UpdatePasswordPayload
@@ -38,7 +39,13 @@ object LinkService {
     }
 
     suspend fun addMultiLink(name: String): MultiLink {
-        return ApiClient.post(MultiLink.serializer(), "link", MultiLink(name, emptyList()), MultiLink.serializer())
+        return ApiClient.post(
+            MultiLink.serializer(), "link", MultiLink(
+                name = name,
+                links = emptyList(),
+                stats = ClickCounts(0, 0)
+            ), MultiLink.serializer()
+        )
     }
 
     suspend fun deleteMultiLink(name: String): MultiLink {

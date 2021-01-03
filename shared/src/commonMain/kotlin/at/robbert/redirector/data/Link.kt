@@ -41,8 +41,15 @@ data class Link(
 )
 
 @Serializable
+data class ClickCounts(
+    val allTime: Int,
+    val last24h: Int
+)
+
+@Serializable
 data class MultiLink(
     @Id val name: String,
     val links: List<Link>,
-    val createdAt: Timestamp? = null
+    val createdAt: Timestamp? = null,
+    val stats: ClickCounts
 )

@@ -9,6 +9,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
     id("com.rohanprabhu.kotlin-dsl-jooq") version "0.4.6"
+    id("org.flywaydb.flyway") version "7.3.0"
 }
 
 group = "at.robbert"
@@ -62,6 +63,13 @@ file("${projectDir.absolutePath}/src/main/resources/application.properties")
         props.load(it)
     }
 
+flyway {
+    url = "jdbc:postgresql://localhost:5432/redirector"
+    user = "redirector"
+    password = "redirector"
+    schemas = arrayOf("public")
+}
+
 jooqGenerator {
     jooqEdition = JooqEdition.OpenSource
     jooqVersion = "3.13.4"
@@ -99,3 +107,6 @@ jooqGenerator {
         }
     }
 }
+
+val `jooq-codegen-primary` by project.tasks
+`jooq-codegen-primary`.dependsOn("flywayMigrate")

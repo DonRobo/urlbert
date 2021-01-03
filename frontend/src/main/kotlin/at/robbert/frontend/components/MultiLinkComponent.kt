@@ -58,6 +58,12 @@ class MultiLinkComponent : RComponent<MultiLinkProps, MultiLinkState>() {
                     }
                 }
             }
+            div {
+                +"All time clicks: ${props.multiLink.stats.allTime}"
+            }
+            div {
+                +"Last 24h clicks: ${props.multiLink.stats.last24h}"
+            }
             props.multiLink.links.mapIndexed { index, link -> link to index }
                 .sortedByDescending { it.first.conditions.size }.forEach { (link, index) ->
                     displayLink {
