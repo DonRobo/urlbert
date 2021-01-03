@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
 private val loggers = ConcurrentHashMap<Class<*>, Logger>()
-val <T : Any> T.log: Logger
+val Any.log: Logger
     get() = loggers.getOrPut(this::class.java) {
         LoggerFactory.getLogger(this::class.java)
     }

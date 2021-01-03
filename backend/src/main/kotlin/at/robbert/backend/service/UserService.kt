@@ -1,9 +1,12 @@
 package at.robbert.backend.service
 
+import at.robbert.backend.jooq.Tables.LOGIN_USER
+import at.robbert.backend.jooq.tables.records.LoginUserRecord
+import at.robbert.backend.util.executeReactive
 import at.robbert.backend.util.log
 import kotlinx.coroutines.reactive.awaitSingle
+import org.jooq.DSLContext
 import org.springframework.data.annotation.Id
-import org.springframework.data.r2dbc.core.DatabaseClient
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -19,18 +22,25 @@ typealias SpringUser = org.springframework.security.core.userdetails.User
 @Table("login_user")
 class User(@Id val username: String, val password: String, val secret: UUID?)
 
-class UserRepositoryCustomImpl(private val databaseClient: DatabaseClient) : UserRepositoryCustom {
+class UserRepositoryCustomImpl(private val ctx: DSLContext) : UserRepositoryCustom {
+    private val lu = LOGIN_USER.`as`("lu")
+
     override fun createUser(user: User): Mono<Int> {
-        return databaseClient.insert().into(User::class.java)
-            .using(user).fetch().rowsUpdated()
+        return ctx.insertInto(lu)
+            .set(LoginUserRecord().apply {
+                this.username = user.username
+                this.password = user.password
+                this.secret = user.secret
+            })
+            .executeReactive()
     }
 
     override fun updatePasswordAndResetSecret(username: String, password: String): Mono<Int> {
-        return databaseClient
-            .update()
-            .table(User::class.java)
-            .using(User(username, password, null))
-            .fetch().rowsUpdated()
+        return ctx.update(lu)
+            .set(lu.PASSWORD, password)
+            .setNull(lu.SECRET)
+            .where(lu.USERNAME.eq(username))
+            .executeReactive()
     }
 }
 

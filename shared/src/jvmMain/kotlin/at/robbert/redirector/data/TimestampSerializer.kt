@@ -6,12 +6,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlin.js.Date
-import kotlin.math.roundToLong
-
-actual class Timestamp actual constructor(time: Long) {
-    val date = Date(time)
-}
 
 actual object TimestampSerializer : KSerializer<Timestamp> {
     override val descriptor: SerialDescriptor
@@ -25,6 +19,6 @@ actual object TimestampSerializer : KSerializer<Timestamp> {
     }
 
     override fun serialize(encoder: Encoder, value: Timestamp) {
-        encoder.encodeLong(value.date.getTime().roundToLong())
+        encoder.encodeLong(value.time)
     }
 }

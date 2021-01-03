@@ -1,9 +1,12 @@
+@file:UseSerializers(TimestampSerializer::class)
+
 package at.robbert.redirector.data
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 
 expect annotation class Id()
+
 expect class Timestamp(time: Long)
 
 const val CONDITION_TYPE_PLATFORM = "PLATFORM"
@@ -41,5 +44,5 @@ data class Link(
 data class MultiLink(
     @Id val name: String,
     val links: List<Link>,
-    @Contextual val createdAt: Timestamp? = null
+    val createdAt: Timestamp? = null
 )

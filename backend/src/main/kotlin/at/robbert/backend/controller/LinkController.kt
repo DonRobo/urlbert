@@ -162,7 +162,7 @@ setTimeout(()=>{
         )
     }
 
-    @GetMapping("/link/**/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
+    @GetMapping("/link/*/{linkName}", produces = [MediaType.TEXT_PLAIN_VALUE])
     suspend fun accessLinkWithPath(
         @PathVariable linkName: String,
         @RequestHeader(value = "user-agent") userAgent: String,

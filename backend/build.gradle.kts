@@ -1,11 +1,14 @@
+import com.rohanprabhu.gradle.plugins.kdjooq.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import java.util.*
 
 plugins {
     id("org.springframework.boot") version "2.4.1"
     id("io.spring.dependency-management") version "1.0.10.RELEASE"
     kotlin("jvm")
     kotlin("plugin.spring")
+    id("com.rohanprabhu.kotlin-dsl-jooq") version "0.4.6"
 }
 
 group = "at.robbert"
@@ -35,7 +38,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("org.flywaydb:flyway-core")
+
+    implementation("de.gofabian:spring-boot-data-r2dbc-jooq:0.3.0")
+    jooqGeneratorRuntime("org.postgresql:postgresql")
     implementation("io.r2dbc:r2dbc-postgresql")
+
     runtimeOnly("org.postgresql:postgresql")
 }
 tasks.withType<KotlinCompile> {
@@ -47,4 +54,48 @@ tasks.withType<KotlinCompile> {
 tasks.withType<BootJar> {
     destinationDirectory.set(project.rootDir)
     archiveFileName.set("urlbert.jar")
+}
+
+val props = Properties()
+file("${projectDir.absolutePath}/src/main/resources/application.properties")
+    .bufferedReader().use {
+        props.load(it)
+    }
+
+jooqGenerator {
+    jooqEdition = JooqEdition.OpenSource
+    jooqVersion = "3.13.4"
+
+    configuration("primary", project.sourceSets.getByName("main")) {
+        databaseSources {
+            +"${projectDir.absolutePath}/src/main/resources/db/migration"
+        }
+        configuration = jooqCodegenConfiguration {
+            databaseSources {
+                +"${project.projectDir}/src/main/resources/db/migration"
+            }
+            jdbc {
+                driver = props["spring.datasource.driver-class-name"] as String
+                username = props["spring.datasource.username"] as String
+                password = props["spring.datasource.password"] as String
+                url = props["spring.datasource.url"] as String
+            }
+            generator {
+                name = "org.jooq.codegen.DefaultGenerator"
+
+                target {
+                    packageName = "at.robbert.backend.jooq"
+                    directory = "${buildDir.absolutePath}/generated/jooq/primary"
+                }
+
+                database {
+                    name = "org.jooq.meta.postgres.PostgresDatabase"
+                    inputSchema = "public"
+                }
+                generate {
+                    withVarargSetters(false)
+                }
+            }
+        }
+    }
 }
