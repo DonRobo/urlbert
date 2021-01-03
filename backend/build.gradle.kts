@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    id("org.springframework.boot") version "2.3.0.RELEASE"
-    id("io.spring.dependency-management") version "1.0.9.RELEASE"
+    id("org.springframework.boot") version "2.4.1"
+    id("io.spring.dependency-management") version "1.0.10.RELEASE"
     kotlin("jvm")
     kotlin("plugin.spring")
 }
@@ -19,8 +19,8 @@ repositories {
 
 dependencies {
     implementation(project(":shared", "jvmRuntimeElements"))
-    implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.1")
-    implementation("io.projectreactor:reactor-tools:3.3.5.RELEASE")
+    implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.2")
+    implementation("io.projectreactor:reactor-tools:3.4.1")
 
     implementation("com.maxmind.geoip2:geoip2:2.13.1")
 

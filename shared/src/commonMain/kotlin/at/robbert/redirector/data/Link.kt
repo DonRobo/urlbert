@@ -1,6 +1,6 @@
 package at.robbert.redirector.data
 
-import kotlinx.serialization.ContextualSerialization
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 expect annotation class Id()
@@ -41,5 +41,5 @@ data class Link(
 data class MultiLink(
     @Id val name: String,
     val links: List<Link>,
-    @ContextualSerialization val createdAt: Timestamp? = null
+    @Contextual val createdAt: Timestamp? = null
 )

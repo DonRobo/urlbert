@@ -7,6 +7,7 @@ import at.robbert.redirector.data.Link
 import at.robbert.redirector.data.LinkCondition
 import at.robbert.redirector.data.MultiLink
 import at.robbert.redirector.data.containsDuplicates
+import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -16,7 +17,6 @@ import react.*
 import react.dom.a
 import styled.css
 import styled.styledDiv
-import kotlin.browser.window
 
 fun RBuilder.multiLink(handler: MultiLinkProps.() -> Unit): ReactElement {
     return child(MultiLinkComponent::class) {

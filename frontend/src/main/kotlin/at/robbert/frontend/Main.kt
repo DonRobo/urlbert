@@ -2,6 +2,7 @@ package at.robbert.frontend
 
 import at.robbert.frontend.components.navigation
 import at.robbert.frontend.lib.initializeCss
+import kotlinx.browser.document
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.css.*
@@ -10,7 +11,6 @@ import react.*
 import react.dom.render
 import styled.css
 import styled.styledDiv
-import kotlin.browser.document
 import kotlin.coroutines.CoroutineContext
 
 const val TELL_ROBERT = "(if you see this tell Robert)"

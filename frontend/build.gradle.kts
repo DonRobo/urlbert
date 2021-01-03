@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
 
 plugins {
@@ -49,9 +50,8 @@ tasks.withType<Kotlin2JsCompile>().configureEach {
 }
 
 kotlin {
-    target {
+    js(fun KotlinJsTargetDsl.() {
         useCommonJs()
-        browser {
-        }
-    }
+        browser { }
+    })
 }

@@ -1,7 +1,7 @@
 package at.robbert.frontend
 
-import kotlin.browser.document
-import kotlin.browser.window
+import kotlinx.browser.document
+import kotlinx.browser.window
 
 external val redirectTo: String
 external val alternative: String

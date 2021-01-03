@@ -1,6 +1,13 @@
 package at.robbert.redirector.data
 
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlin.js.Date
 import kotlin.math.roundToLong
 
@@ -12,7 +19,7 @@ actual class Timestamp actual constructor(time: Long) {
     companion object : KSerializer<Timestamp> {
 
         override val descriptor: SerialDescriptor
-            get() = PrimitiveDescriptor(
+            get() = PrimitiveSerialDescriptor(
                 "Timestamp",
                 PrimitiveKind.LONG
             )
