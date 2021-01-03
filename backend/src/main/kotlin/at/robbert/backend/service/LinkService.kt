@@ -9,53 +9,54 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.jooq.DSLContext
-import org.jooq.JSONB
-import org.springframework.data.repository.reactive.ReactiveCrudRepository
+import org.jooq.Record
+import org.jooq.RecordMapper
+import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-class CustomLinkRepositoryImpl(private val ctx: DSLContext, private val objectMapper: ObjectMapper) :
-    CustomLinkRepository {
-    private val ml = Tables.MULTI_LINK.`as`("ml")
+class MultilinkMapper(
+    private val ml: at.robbert.backend.jooq.tables.MultiLink,
+    private val objectMapper: ObjectMapper
+) : RecordMapper<Record, MultiLink> {
+    override fun map(r: Record): MultiLink = MultiLink(
+        name = r[ml.NAME],
+        links = objectMapper.readValue(r[ml.LINKS].data()),
+        createdAt = r[ml.CREATED_AT]
+    )
+}
 
-    override fun retrieveAllDescByAge(): Flux<MultiLink> {
+@Repository
+class LinkRepository(
+    ctx: DSLContext,
+    private val objectMapper: ObjectMapper
+) : MappingCrudJooqRepository<MultiLinkRecord, MultiLink>(ctx, Tables.MULTI_LINK, MultilinkMapper(ml, objectMapper)) {
+    companion object {
+        private val ml = Tables.MULTI_LINK
+    }
+
+    fun retrieveAllDescByAge(): Flux<MultiLink> {
         return ctx.selectFrom(ml)
             .orderBy(ml.CREATED_AT)
             .fetchReactive()
-            .map {
-                val ml = MultiLink(
-                    name = it.name,
-                    links = objectMapper.readValue(it.links.data()),
-                    createdAt = it.createdAt
-                )
-                log.debug(ml.toString())
-                ml
-            }
+            .map(mapper::map)
     }
 
-    override fun insert(multiLink: MultiLink): Mono<Int> {
-        return ctx.insertInto(ml)
-            .set(MultiLinkRecord().apply {
-                this.name = multiLink.name
-                this.links = JSONB.valueOf(objectMapper.writeValueAsString(multiLink.links))
-                this.createdAt = currentTimestamp()
-            })
-            .executeReactive()
+    fun update(record: MultiLinkRecord): Mono<MultiLink> {
+        return ctx.update(ml)
+            .set(record)
+            .where(ml.NAME.eq(record.name))
+            .returning()
+            .executeReturningOneReactive()
+            .map(mapper::map)
     }
 }
-
-interface CustomLinkRepository {
-    fun retrieveAllDescByAge(): Flux<MultiLink>
-    fun insert(multiLink: MultiLink): Mono<Int>
-}
-
-interface LinkRepository : ReactiveCrudRepository<MultiLink, String>, CustomLinkRepository
 
 @Service
-class LinkService(private val linkRepository: LinkRepository) {
+class LinkService(private val linkRepository: LinkRepository, private val objectMapper: ObjectMapper) {
     suspend fun retrieveMultiLink(linkName: String): MultiLink? {
-        return linkRepository.findById(linkName).awaitFirstOrNull()
+        return linkRepository.findByIdMapped(linkName).awaitFirstOrNull()
     }
 
     suspend fun retrieveLink(linkName: String, platform: String, country: String): Link {
@@ -71,13 +72,19 @@ class LinkService(private val linkRepository: LinkRepository) {
     }
 
     suspend fun updateLink(multiLink: MultiLink): MultiLink {
-        val ml = retrieveMultiLink(multiLink.name) ?: error("Updated link disappeared!")
-        return linkRepository.save(ml.copy(links = multiLink.links)).awaitSingle()
+        return linkRepository.update(
+            MultiLinkRecord().apply {
+                name = multiLink.name
+                links = objectMapper.toJsonB(multiLink.links)
+            }
+        ).awaitSingle()
     }
 
     suspend fun addLink(multiLink: MultiLink): MultiLink {
-        linkRepository.insert(multiLink.copy(createdAt = null)).awaitSingle()
-        return linkRepository.findById(multiLink.name).awaitSingle()
+        return linkRepository.insertMapped(MultiLinkRecord().apply {
+            this.name = multiLink.name
+            this.links = objectMapper.toJsonB(multiLink.links)
+        }).awaitSingle()
     }
 
     suspend fun deleteLink(name: String) {

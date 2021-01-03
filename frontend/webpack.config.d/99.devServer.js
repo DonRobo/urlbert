@@ -11,7 +11,10 @@
     config.devServer = config.devServer || {}
     config.devServer.proxy = {
         '/api': serverUrl,
-        '/link': serverUrl,
+        '/link': {
+            target: serverUrl,
+            xfwd: true
+        },
         '/jsRedirect.js': redirectorUrl
     }
     config.devServer.watchOptions = config.devServer.watchOptions || {};

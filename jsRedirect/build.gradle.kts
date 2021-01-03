@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
 
 plugins {
@@ -15,6 +14,7 @@ repositories {
     maven("https://dl.bintray.com/kotlin/kotlin-js-wrappers")
     maven("https://dl.bintray.com/kotlin/kotlinx")
     mavenCentral()
+    maven(url = "https://kotlin.bintray.com/kotlinx/")
 }
 
 dependencies {
@@ -23,14 +23,15 @@ dependencies {
 
 tasks.withType<Kotlin2JsCompile>().configureEach {
     kotlinOptions.suppressWarnings = true
-    kotlinOptions.sourceMap = false
-    kotlinOptions.sourceMapEmbedSources = "never"
+    kotlinOptions.sourceMap = true
+    kotlinOptions.sourceMapEmbedSources = "always"
 }
 
 kotlin {
-    js(fun KotlinJsTargetDsl.() {
+    js(LEGACY) {
         useCommonJs()
         browser {
         }
-    })
+        binaries.executable()
+    }
 }
