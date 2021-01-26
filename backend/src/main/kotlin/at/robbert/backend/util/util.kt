@@ -8,10 +8,6 @@ import org.jooq.impl.DSL
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
-fun currentTimestamp(): Timestamp {
-    return Timestamp.valueOf(LocalDateTime.now())
-}
-
 fun LocalDateTime.toTimestamp(): Timestamp {
     return Timestamp.valueOf(this)
 }
