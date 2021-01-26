@@ -10,13 +10,13 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
 import org.jooq.impl.DSL.count
 import org.jooq.impl.DSL.select
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.time.Duration
 
 class MultilinkMapper(
     private val ml: at.robbert.backend.jooq.tables.MultiLink,
@@ -32,7 +32,7 @@ class MultilinkMapper(
     private val last24h = select(count(lc.ID))
         .from(lc)
         .where(lc.MULTI_LINK_NAME.eq(ml.NAME))
-        .and(lc.TIME.youngerThan(Duration.ofHours(24)))
+        .and(lc.TIME.greaterOrEqual(DSL.now().minus(interval("1 day"))))
         .asField<Int>("last24h")
 
     override val fields = listOf(ml.NAME, ml.LINKS, ml.CREATED_AT, allTime, last24h)
@@ -65,13 +65,12 @@ class LinkRepository(
             .map(mapper)
     }
 
-    fun update(record: MultiLinkRecord): Mono<MultiLink> {
+    fun update(record: MultiLinkRecord): Mono<Int> {
         return ctx.update(ml)
             .set(record)
             .where(ml.NAME.eq(record.name))
             .returning()
-            .executeReturningOneReactive()
-            .map(mapper)
+            .executeReactive()
     }
 
     override fun <T> deleteById(id: T): Mono<Int> {
@@ -83,20 +82,19 @@ class LinkRepository(
             .then(ctx.deleteFrom(ml).where(ml.NAME.eq(id)).executeReactive())
     }
 
-    fun findByIdMapped(linkName: String): Flux<MultiLink> {
+    fun findByIdMapped(linkName: String): Mono<MultiLink> {
         return ctx.select(mapper.fields)
             .from(ml)
             .where(ml.NAME.eq(linkName))
-            .fetchReactive()
+            .fetchOneReactive()
             .map(mapper)
     }
 
-    fun insertMapped(r: MultiLinkRecord): Mono<MultiLink> {
+    fun insertMapped(r: MultiLinkRecord): Mono<Int> {
         return ctx.insertInto(ml)
             .set(r)
             .returning()
-            .executeReturningOneReactive()
-            .map(mapper)
+            .executeReactive()
     }
 }
 
@@ -128,14 +126,14 @@ class LinkService(
                 name = multiLink.name
                 links = objectMapper.toJsonB(multiLink.links)
             }
-        ).awaitSingle()
+        ).then(linkRepository.findByIdMapped(multiLink.name)).awaitSingle()
     }
 
     suspend fun addLink(multiLink: MultiLink): MultiLink {
         return linkRepository.insertMapped(MultiLinkRecord().apply {
             this.name = multiLink.name
             this.links = objectMapper.toJsonB(multiLink.links)
-        }).awaitSingle()
+        }).then(linkRepository.findByIdMapped(multiLink.name)).awaitSingle()
     }
 
     suspend fun deleteLink(name: String) {
