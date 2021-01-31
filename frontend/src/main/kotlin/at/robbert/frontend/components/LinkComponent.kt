@@ -33,7 +33,7 @@ class LinkComponent : RComponent<LinkProps, RState>() {
                 }
                 div {
                     +when (props.link.redirection.method) {
-                        HTTP -> "HTTP ${props.link.redirection.status!!} redirect"
+                        HTTP -> "HTTP ${props.link.redirection.status ?: "NOT_SET"} redirect"
                         JS -> "Redirect using Javascript"
                         FAST_JS -> "Redirect using lightweight Javascript"
                     }
